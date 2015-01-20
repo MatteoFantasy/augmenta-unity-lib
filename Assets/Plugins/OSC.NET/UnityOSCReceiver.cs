@@ -28,18 +28,22 @@ public class UnityOSCReceiver : MonoBehaviour {
 	}
 
 	public bool reconnect(){
-		if (receiver.getPort() == port){
-			return false;
-		} else {
-			if(connected){
-				disconnect();
-				Invoke("connect", .1f); //wait a tick to sync threading before reconnecting
+		if (receiver != null){
+			if (receiver.getPort() == port){
+				return false;
 			}
-			else{
-				connect();
-			}
-			return true;
 		}
+
+		// else
+		if(connected){
+			disconnect();
+			Invoke("connect", .1f); //wait a tick to sync threading before reconnecting
+		}
+		else{
+			connect();
+		}
+		return true;
+
 	}
 	
 	public void connect(){

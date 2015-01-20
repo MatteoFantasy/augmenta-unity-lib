@@ -81,6 +81,8 @@ public class auListener : MonoBehaviour  {
 	public void OSCMessageReceived(OSC.NET.OSCMessage message){
 		string address = message.Address;
 		ArrayList args = message.Values;
+
+		Debug.Log("OSC received with address : "+address);
 		
 		if (address == "/au/personEntered/" || address == "/au/personEntered") {
 			int pid = (int)args[0];
@@ -159,8 +161,11 @@ public class auListener : MonoBehaviour  {
 	// Co-routine to check if person is alive or not
 	IEnumerator checkAlive() {
 		while(true) {
-			foreach(KeyValuePair<int, Person> pPair in arrayPerson) {
-				int id = pPair.Key;
+			ArrayList ids = new ArrayList();
+			foreach(KeyValuePair<int, Person> p in arrayPerson) {
+				ids.Add(p.Key);
+			}
+			foreach(int id in ids) {
 				if(arrayPerson.ContainsKey(id)){
 								
 					Person p = arrayPerson[id];
@@ -177,6 +182,7 @@ public class auListener : MonoBehaviour  {
 					}
 				}
 			}
+			ids.Clear();
 			yield return 0;
 		}
 	}
