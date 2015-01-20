@@ -8,7 +8,7 @@ public class displayAugmentaCubes : MonoBehaviour {
 	// This class is an example of how to use the messages sent by the library : PersonEntered / PersonUpdated / PersonWillLeave
 	// The best practice is to use them whenever you need to instanciate, maintain, and destroy objects representing the people in the scene
 	//
-	// If you only need to loop through the people's array to get information, the easiest way is to access the auListener's array like this :
+	// If you simply need to loop through the people's array to get the raw information, the easiest way is to access the auListener's array like this :
 	//
 	// foreach(KeyValuePair<int, Person> pPair in auListener.getPeopleArray()) {
 	//   	Debug.Log("The point with id ["+pPair.Key+"] is at x="+pPair.Value.centroid.x+" and y="+pPair.Value.centroid.y);
@@ -28,7 +28,7 @@ public class displayAugmentaCubes : MonoBehaviour {
 		// Called once per frame
 
 		// This loop is for demonstration purposes only !
-		// This is how you loop through all the Augmenta points from anywhere in the code
+		// This is how you loop through all the Augmenta raw points from anywhere in the code
 		/*
 		foreach(KeyValuePair<int, Person> pPair in auListener.getPeopleArray()) {
 			Debug.Log("The point with id ["+pPair.Key+"] is at x="+pPair.Value.centroid.x+" and y="+pPair.Value.centroid.y);
