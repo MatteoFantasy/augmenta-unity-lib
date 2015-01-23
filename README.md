@@ -29,7 +29,7 @@ How to connect your app with Augmenta :
 	Dictionary<int,GameObject> myAugmentaObjects = auInterface.getAugmentaObjects();
 - Loop through it to read the informations :
 	foreach(KeyValuePair<int, GameObject> pair in myAugmentaObjects) {
-		Debug.Log("The point with id ["+pair.Key+"] is located at : x="+pair.Value.transform.position.x+" and y="+pair.Value.transform.position.z);
+		Debug.Log("The point with id ["+pair.Key+"] is located at : x="+pair.Value.GetComponent<PersonObject>().getCentroid().x+" and y="+pair.Value.GetComponent<PersonObject>().getCentroid().z);
 		Debug.Log ("He's "+pair.Value.GetComponent<PersonObject>().getAge()+" frames old");
 	}
 

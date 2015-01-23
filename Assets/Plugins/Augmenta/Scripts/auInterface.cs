@@ -14,7 +14,7 @@ public class auInterface : MonoBehaviour {
 			Dictionary<int,GameObject> myAugmentaObjects = auInterface.getAugmentaObjects();
 		- Loop through it to read the informations :
 			foreach(KeyValuePair<int, GameObject> pair in myAugmentaObjects) {
-				Debug.Log("The point with id ["+pair.Key+"] is located at : x="+pair.Value.transform.position.x+" and y="+pair.Value.transform.position.z);
+				Debug.Log("The point with id ["+pair.Key+"] is located at : x="+pair.Value.GetComponent<PersonObject>().getCentroid().x+" and y="+pair.Value.GetComponent<PersonObject>().getCentroid().z);
 				Debug.Log ("He's "+pair.Value.GetComponent<PersonObject>().getAge()+" frames old");
 			}
 
@@ -41,6 +41,7 @@ public class auInterface : MonoBehaviour {
 	public GameObject personMarker; // Used to represent people moving about in our example
 
 	public static bool debug = true;
+	private bool boundingBoxValid = true;
 	
 	void Start () {
 		// Launched at scene startup
@@ -128,21 +129,57 @@ public class auInterface : MonoBehaviour {
 		Transform bt = boundingPlane.transform;
 		Bounds meshBounds = boundingPlane.GetComponent<MeshFilter>().sharedMesh.bounds;
 
-		// Reset at zero
+		// Reset
 		pt.position = Vector3.zero;
 		pt.rotation = Quaternion.identity;
+		GameObject centroidObject = new GameObject();
+		centroidObject.transform.position = Vector3.zero;
+		centroidObject.transform.rotation = Quaternion.identity;
+
+		// Test if the bounding box info is valid
+		if (person.boundingRect.x >= 0 && person.boundingRect.y >=0 && person.boundingRect.width > 0 && person.boundingRect.height > 0){
+			boundingBoxValid = true;
+		} else if (boundingBoxValid) {
+			boundingBoxValid = false;
+			Debug.LogWarning("The bounding box informations are not valid, we'll be using the centroid and a default scale instead for the debug display");
+		}
+
+		if (boundingBoxValid){
+			// Take care of the bounding box's scale
+			Vector3 bsize = bt.GetComponent<MeshRenderer>().bounds.size;
+			Vector3 psize = pt.GetComponent<MeshRenderer>().bounds.size;
+			Vector3 scale = pt.localScale;
+			scale.x = bsize.x * scale.x / psize.x * person.boundingRect.width;
+			scale.z = bsize.z * scale.z / psize.z * person.boundingRect.height;
+			pt.localScale = scale;
+		}
 
 		// Rotate
+		// Warning : may cause small imprecisions in the points positioning...keep the area straight if you can
 		pt.Rotate(bt.rotation.eulerAngles);
+		centroidObject.transform.Rotate(bt.rotation.eulerAngles);
 
-		// Move inside the area depending on the centroid's value and depending on the scale
-		pt.Translate( (float)(.5 - person.centroid.x) * meshBounds.size.x * -1 * bt.localScale.x, 0, (float)(person.centroid.y - .5) * meshBounds.size.z * -1 * bt.localScale.z);
+		if (boundingBoxValid){
+			// Move inside the area depending on the bounding box's values and depending on the scale
+			pt.Translate( (float)(person.boundingRect.x+person.boundingRect.width/2 - 0.5f) * meshBounds.size.x * bt.localScale.x, 0, (float)(person.boundingRect.y+person.boundingRect.height	/2 - .5) * meshBounds.size.z * -1 * bt.localScale.z);
+		} else {
+			pt.Translate( (float)(person.centroid.x - 0.5f) * meshBounds.size.x * bt.localScale.x, 0, (float)(person.centroid.y - .5) * meshBounds.size.z * -1 * bt.localScale.z);
+		}
+		// Compute the centroid inside the area
+		centroidObject.transform.Translate( (float)(person.centroid.x - 0.5f) * meshBounds.size.x * bt.localScale.x, 0, (float)(person.centroid.y - .5) * meshBounds.size.z * -1 * bt.localScale.z);
 
 		// Put the bottom of the cubes on the plane (not the center)
 		pt.Translate( 0, pt.localScale.y/2, 0 );
+		centroidObject.transform.Translate( 0, pt.localScale.y/2, 0 );
 
 		// Move to reach the position of the area
 		pt.Translate(bt.position, Space.World);
+		centroidObject.transform.Translate(bt.position, Space.World);
+
+		// Update the centroid's value
+		personObject.GetComponent<PersonObject>().setCentroid(centroidObject.transform.position);
+
+		Destroy(centroidObject);
 
 	}	
 }
