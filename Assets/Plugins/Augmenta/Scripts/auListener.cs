@@ -82,7 +82,7 @@ public class auListener : MonoBehaviour  {
 		string address = message.Address;
 		ArrayList args = message.Values;
 
-		Debug.Log("OSC received with address : "+address);
+		//Debug.Log("OSC received with address : "+address);
 		
 		if (address == "/au/personEntered/" || address == "/au/personEntered") {
 			int pid = (int)args[0];
